@@ -1,14 +1,20 @@
-import tweepy
 import os
-import
+import time
 from os import environ
+import tweepy
+from dotenv import load_dotenv
 
-CONSUMER_KEY = environ['CONSUMER_KEY']
-CONSUMER_SECRET = environ['CONSUMER_SECRET']
-ACCESS_KEY = environ['ACCESS_KEY']
-ACCESS_SECRET = environ['ACCESS_SECRET']
+load_dotenv()
 
+CONSUMER_KEY = environ.get("CONSUMER_KEY")
+CONSUMER_SECRET = environ.get("CONSUMER_SECRET")
+ACCESS_KEY = environ.get("ACCESS_KEY")
+ACCESS_SECRET = environ.get("ACCESS_SECRET")
+
+
+print("starting the service")
 FILENAME_FAV = "id_favorite_tweet.txt" 
+
 
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
@@ -27,16 +33,19 @@ def store_last_seen_id(last_seen_id,file_name):
   return
 
 def fav_tweet():
-  last_seen_id = retrieve_last_seen_id(FILE_NAME_FAV)
+  print("Retrieving Tagged Tweets...")
+  last_seen_id = retrieve_last_seen_id(FILENAME_FAV)
   mentions = api.mentions_timeline(last_seen_id,tweet_mode='extended')
   for mention in reversed(mentions):
     if not mention:
       return
-    print(str(mention.id)+' - '+mention.full_text,flush=True)
+    print(str(mention.id)+' - '+mention.full_text)
     last_fav_tweet = mention.id
-    store_last_seen_id(last_fav_tweet,FILE_NAME_FAV)
+    store_last_seen_id(last_fav_tweet,FILENAME_FAV)
     api.create_favorite(mention.id)
     api.retweet(mention.id)
+    print("Found @Ali1995Nermine")
+    print("Liked and retweeted!")
 
 
 while True:
